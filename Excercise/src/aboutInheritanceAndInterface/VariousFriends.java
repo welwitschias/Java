@@ -38,26 +38,47 @@ class Artist implements Friend {
 
 }
 
-class Architect extends Artist {
+class Architect implements Friend {
+
+	private String name;
 
 	public Architect(String name) {
-		super(name);
+		this.name = name;
+	}
+
+	@Override
+	public void dearFriend() {
+		System.out.printf("%s → 칭구 아이가!\n", this.name);
 	}
 
 }
 
-class Developer extends Artist {
+class Developer implements Friend {
+
+	private String name;
 
 	public Developer(String name) {
-		super(name);
+		this.name = name;
+	}
+
+	@Override
+	public void dearFriend() {
+		System.out.printf("%s → 칭구 아이가!\n", this.name);
 	}
 
 }
 
-class Lawyer extends Artist {
+class Lawyer implements Friend {
+
+	private String name;
 
 	public Lawyer(String name) {
-		super(name);
+		this.name = name;
+	}
+
+	@Override
+	public void dearFriend() {
+		System.out.printf("%s → 칭구 아이가!\n", this.name);
 	}
 
 }

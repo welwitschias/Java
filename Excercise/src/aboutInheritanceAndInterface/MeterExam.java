@@ -17,9 +17,9 @@ interface Meter {
 
 	public int BASE_FARE = 3000; // 인터페이스에서 정의한 변수는 상수임
 
-	public abstract void start();
+	void start();
 
-	public abstract void stop(int distnace);
+	void stop(int distnace);
 
 }
 
@@ -33,7 +33,7 @@ class Taxi implements Meter {
 	@Override
 	public void stop(int distance) {
 		int fare = BASE_FARE + (distance * 2);
-		System.out.printf("운행을 종료합니다. 요금은 %d원 입니다.", fare);
+		System.out.printf("운행을 종료합니다. 요금은 %d원 입니다.\n", fare);
 	}
 
 }
