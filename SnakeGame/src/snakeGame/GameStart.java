@@ -12,7 +12,7 @@ public class GameStart {
 		System.out.println("    [1]EASY   [2]NORMAL   [3]HARD    ");
 		System.out.println("=====================================");
 
-		/* 난이도 선택하기 : 1~3번 key 입력이 아닐 경우 해당 key가 입력될 때까지 반복한다. */
+		/* 난이도 선택하기 : 1~3번 키입력이 아닐 경우 해당 키가 입력될 때까지 반복한다. */
 		boolean isNumber = false;
 
 		do {
@@ -43,7 +43,6 @@ public class GameStart {
 		} while (!isNumber);
 
 		scan.close();
-
 	}
 
 }

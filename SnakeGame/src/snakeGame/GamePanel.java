@@ -3,48 +3,51 @@ package snakeGame;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
+import javax.swing.*;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
-public class HardMode extends JPanel implements ActionListener {
+public class GamePanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
 	/* 변수 설정하기 */
 	private int screenWidth = 1500;
 	private int screenHeight = 900;
-
 	private int gridSize = 60;
 	private int grids = (screenWidth / gridSize) * (screenHeight / gridSize);
-
 	private int x[] = new int[grids];
 	private int y[] = new int[grids];
 
-	private int speed = 40;
-	private int bodyLength = 7;
-
-	private int foodsEaten;
-	private int foodX, foodY;
+	private int foodsEaten = 0;
+	private int foodX;
+	private int foodY;
 
 	private char direction = 'R';
 	private boolean running = false;
 
-	Timer timer = new Timer(speed, this);
+	public int speed;
+	public int bodyLength;
+
+	Timer timer;
 	Random random = new Random();
 
 	/* 패널화면 설정 */
-	HardMode() {
+	GamePanel(int speed, int bodyLength) {
+
+		this.speed = speed;
+		this.bodyLength = bodyLength;
+
 		setBackground(Color.BLACK);
 		setPreferredSize(new Dimension(screenWidth, screenHeight));
 		setFocusable(true);
 		addKeyListener(new MyKeyAdapter());
 		startGame();
+
 	}
 
 	public void startGame() {
 		newFood();
 		running = true;
+		timer = new Timer(speed, this);
 		timer.start();
 	}
 
@@ -54,15 +57,15 @@ public class HardMode extends JPanel implements ActionListener {
 		foodY = random.nextInt(screenHeight / gridSize) * gridSize;
 	}
 
-	/* Swing Component가 자신의 모양을 그리는 method */
+	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g); // 패널에서 이전에 그려진 잔상을 지움
+		super.paintComponent(g); // 패널에서 이전에 그려진 잔상을 지워줌
 		draw(g);
 	}
 
 	public void draw(Graphics g) {
 		if (running) {
-			/* 화면에 Grid(격자) 표시하기 */
+			/* 화면에 격자 표시하기 */
 			for (int i = 0; i < screenWidth / gridSize; i++) {
 				g.drawLine(0, i * gridSize, screenWidth, i * gridSize); // 가로 격자
 				g.drawLine(i * gridSize, 0, i * gridSize, screenHeight); // 세로 격자
@@ -72,10 +75,10 @@ public class HardMode extends JPanel implements ActionListener {
 			g.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
 			g.fillRect(foodX, foodY, gridSize, gridSize);
 
-			/* 뱀을 화면에 나타내기 */
+			/* 뱀(플레이어)을 화면에 나타내기 */
 			for (int i = 0; i < bodyLength; i++) {
 				if (i == 0) {
-					g.setColor(Color.PINK);
+					g.setColor(Color.GREEN);
 					g.fillRect(x[i], y[i], gridSize, gridSize);
 				} else {
 					g.setColor(Color.WHITE);
@@ -83,10 +86,12 @@ public class HardMode extends JPanel implements ActionListener {
 				}
 			}
 
-			/* 화면 위에 점수(score) 표시하기 */
+			/* 화면 가운데 상단에 점수 표시하기 */
 			g.setColor(Color.WHITE);
-			g.setFont(new Font("SanSerif", Font.BOLD, 20));
-			g.drawString("Score : " + foodsEaten, (screenWidth / 2) - gridSize, 30);
+			g.setFont(new Font("SanSerif", Font.BOLD, 30));
+			FontMetrics metrics1 = getFontMetrics(g.getFont());
+			g.drawString("Score : " + foodsEaten, (screenWidth - metrics1.stringWidth("Score : " + foodsEaten)) / 2,
+					gridSize);
 		} else {
 			gameOver(g);
 		}
@@ -98,24 +103,25 @@ public class HardMode extends JPanel implements ActionListener {
 			y[i] = y[i - 1];
 		}
 
+		/* U → Up, D → Down, L → Left, R → Right */
 		switch (direction) {
-		case 'U': // up
+		case 'U':
 			y[0] = y[0] - gridSize;
 			break;
-		case 'D': // down
+		case 'D':
 			y[0] = y[0] + gridSize;
 			break;
-		case 'L': // left
+		case 'L':
 			x[0] = x[0] - gridSize;
 			break;
-		case 'R': // right
+		case 'R':
 			x[0] = x[0] + gridSize;
 			break;
 		}
 	}
 
 	/* 뱀이 음식을 먹었을 때 */
-	public void checkFood() {
+	public void eatFood() {
 		if ((x[0] == foodX) && (y[0] == foodY)) {
 			bodyLength++;
 			foodsEaten++;
@@ -124,41 +130,45 @@ public class HardMode extends JPanel implements ActionListener {
 	}
 
 	/* 뱀이 충돌했을 때 */
-	public void checkCollisions() {
+	public void collisions() {
 		/* 머리가 자신의 몸이랑 충돌했을 때 */
 		for (int i = bodyLength; i > 0; i--) {
 			if (x[0] == x[i] && y[0] == y[i]) {
 				running = false;
-				timer.stop();
 			}
 		}
 
 		/* 벽에 충돌했을 때 */
 		if ((x[0] < 0) || (x[0] > screenWidth) || (y[0] < 0) || (y[0] > screenHeight)) {
 			running = false;
+		}
+
+		if (!running) {
 			timer.stop();
 		}
 	}
 
 	public void gameOver(Graphics g) {
-		/* 점수(score) 표시하기 */
+		/* 점수 표시하기 */
 		g.setColor(Color.WHITE);
-		g.setFont(new Font("SanSerif", Font.BOLD, 20));
-		g.drawString("Score : " + foodsEaten, (screenWidth / 2) - gridSize, 30);
+		g.setFont(new Font("SanSerif", Font.BOLD, 30));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString("Score : " + foodsEaten, (screenWidth - metrics2.stringWidth("Score : " + foodsEaten)) / 2,
+				gridSize);
 
 		/* 게임종료 표시하기 */
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("SanSerif", Font.BOLD, 60));
-		FontMetrics metrics = getFontMetrics(g.getFont());
-		g.drawString("Game Over", (screenWidth - metrics.stringWidth("Game Over")) / 2, screenHeight / 2);
+		g.setColor(Color.RED);
+		g.setFont(new Font("SanSerif", Font.BOLD, 80));
+		FontMetrics metrics3 = getFontMetrics(g.getFont());
+		g.drawString("Game Over", (screenWidth - metrics3.stringWidth("Game Over")) / 2, screenHeight / 2);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (running) {
 			move();
-			checkFood();
-			checkCollisions();
+			eatFood();
+			collisions();
 		}
 		repaint();
 	}
@@ -166,7 +176,7 @@ public class HardMode extends JPanel implements ActionListener {
 	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			int keyCode = e.getKeyCode(); // 상하좌우 key는 유니코드가 아니므로 사용
+			int keyCode = e.getKeyCode(); // 상하좌우 방향키는 유니코드가 아니므로 getKeyCode() 사용
 			switch (keyCode) {
 			case KeyEvent.VK_LEFT:
 				if (direction != 'R') {
