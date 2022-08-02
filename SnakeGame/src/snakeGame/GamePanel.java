@@ -97,6 +97,21 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	public void gameOver(Graphics g) {
+		/* 점수 표시하기 */
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("SanSerif", Font.BOLD, 30));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString("Score : " + foodsEaten, (screenWidth - metrics2.stringWidth("Score : " + foodsEaten)) / 2,
+				gridSize);
+
+		/* 게임종료 표시하기 */
+		g.setColor(Color.RED);
+		g.setFont(new Font("SanSerif", Font.BOLD, 80));
+		FontMetrics metrics3 = getFontMetrics(g.getFont());
+		g.drawString("Game Over", (screenWidth - metrics3.stringWidth("Game Over")) / 2, screenHeight / 2);
+	}
+
 	public void move() {
 		for (int i = bodyLength; i > 0; i--) {
 			x[i] = x[i - 1];
@@ -117,6 +132,35 @@ public class GamePanel extends JPanel implements ActionListener {
 		case 'R':
 			x[0] = x[0] + gridSize;
 			break;
+		}
+	}
+
+	public class MyKeyAdapter extends KeyAdapter {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			int keyCode = e.getKeyCode(); // 상하좌우 방향키는 유니코드가 아니므로 getKeyCode() 사용
+			switch (keyCode) {
+			case KeyEvent.VK_LEFT:
+				if (direction != 'R') {
+					direction = 'L';
+				}
+				break;
+			case KeyEvent.VK_RIGHT:
+				if (direction != 'L') {
+					direction = 'R';
+				}
+				break;
+			case KeyEvent.VK_UP:
+				if (direction != 'D') {
+					direction = 'U';
+				}
+				break;
+			case KeyEvent.VK_DOWN:
+				if (direction != 'U') {
+					direction = 'D';
+				}
+				break;
+			}
 		}
 	}
 
@@ -148,21 +192,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
-	public void gameOver(Graphics g) {
-		/* 점수 표시하기 */
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("SanSerif", Font.BOLD, 30));
-		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString("Score : " + foodsEaten, (screenWidth - metrics2.stringWidth("Score : " + foodsEaten)) / 2,
-				gridSize);
-
-		/* 게임종료 표시하기 */
-		g.setColor(Color.RED);
-		g.setFont(new Font("SanSerif", Font.BOLD, 80));
-		FontMetrics metrics3 = getFontMetrics(g.getFont());
-		g.drawString("Game Over", (screenWidth - metrics3.stringWidth("Game Over")) / 2, screenHeight / 2);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (running) {
@@ -171,35 +200,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			collisions();
 		}
 		repaint();
-	}
-
-	public class MyKeyAdapter extends KeyAdapter {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			int keyCode = e.getKeyCode(); // 상하좌우 방향키는 유니코드가 아니므로 getKeyCode() 사용
-			switch (keyCode) {
-			case KeyEvent.VK_LEFT:
-				if (direction != 'R') {
-					direction = 'L';
-				}
-				break;
-			case KeyEvent.VK_RIGHT:
-				if (direction != 'L') {
-					direction = 'R';
-				}
-				break;
-			case KeyEvent.VK_UP:
-				if (direction != 'D') {
-					direction = 'U';
-				}
-				break;
-			case KeyEvent.VK_DOWN:
-				if (direction != 'U') {
-					direction = 'D';
-				}
-				break;
-			}
-		}
 	}
 
 }
